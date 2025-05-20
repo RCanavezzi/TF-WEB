@@ -1,0 +1,19 @@
+# Usa imagem oficial do Node 22
+FROM node:22
+
+# Cria diretório de trabalho
+WORKDIR /app
+
+# Copia arquivos da aplicação
+COPY package*.json ./
+COPY server.js ./
+
+# Instala dependências
+RUN npm install -g nodemon && npm install
+
+# Expõe a porta usada pelo Express (ajuste conforme necessário)
+# Foi comentado pois foi exposto no docker compose
+# EXPOSE 3000
+
+# Comando padrão ao iniciar o container
+ENTRYPOINT ["npm", "run", "dev"]
