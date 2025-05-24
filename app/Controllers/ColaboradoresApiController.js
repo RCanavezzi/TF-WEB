@@ -1,6 +1,6 @@
 // controllers/ToDoController.js
 import "../../bootstrap/app.js"
-import ColaboradoresApiController from "../Models/ColaboradoresModel.js";
+import ColaboradoresModel from "../Models/ColaboradoresModel.js";
 
 export default (function () {
 
@@ -19,24 +19,28 @@ export default (function () {
             if (limit > MAX_LIMIT) {
                 return res.status(400).json({ error: 'Limit máximo: 100.' });
             }
-
-            const colaboradores= await ColaboradoresApiModel.findAll({
+            
+            const colaboradores = await ColaboradoresModel.findAll({
                 limit: limit + 1,
                 offset: offset,
                 order: [["id", "ASC"]]
-            })
-
+            });
+            
             const temMais = colaboradores.length > limit;
-            let rows = colaboradores;
+            let rows =  colaboradores;
+            
+            if(temMais){
+                rows = rows.slice(0, limit);
+            }
 
             const resposta = {
-                rows: (temMais)?(colaboradores.slice(0,limit)): colaboradores,
+                rows: (temMais)? (colaboradores.slice(0, limit)):colaboradores,
                 limit: limit,
-                next: (temMais)? (offset=limit):null
-            };
-            return res.status(200).json(resposta);
+                next: (temMais)? (offset+limit):null
+            }
 
-            // TodoModel.findAll(options: {...})
+            return res.status(200).json({resposta});
+
             // limit: int
             // offset: int
             // order: [field, ASC or DESC]
@@ -56,9 +60,9 @@ export default (function () {
 
             const id = req.params.id;
 
-            // TodoModel.findByPk(id)
+            ColaboradoresModel.findByPk(id)
 
-            return res.status(404).json({ error: 'Tarefa não encontrada.' });
+            //return res.status(404).json({ error: 'Tarefa não encontrada.' });
 
             try {
 
@@ -72,22 +76,24 @@ export default (function () {
 
             // req.body = request body
 
-            const title = req.body.title;
-            const is_checked = req.body.is_checked;
+            const nome = req.body.nome;
+            const cargo = req.body.cargo;
+            const pode_desenvolver = req.body.pode_desenvolver;
 
-        const todo = await ColaboradoresApiController.create({ 
-            title: title,
-            is_checked: is_checked
-         });
+            const colaboradores = await ColaboradoresModel.create({
+                nome: nome,
+                cargo: cargo,
+                pode_desenvolver: pode_desenvolver
+            });
 
-            return res.status(201).json(todo);
+            return res.status(201).json(colaboradores);
 
             try {
 
             } catch (error) {
                 return res.status(500).json({ error: 'Error de servidor.' })
             }
-        }
+        },
 
     };
 })();

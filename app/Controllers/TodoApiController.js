@@ -26,10 +26,16 @@ export default (function () {
                 order: [["id", "ASC"]]
             })
 
-            return res.status(200).json({
-                rows: todos,
-                limit: limit
-            });
+            const temMais = todos.length > limit;
+            let rows =  todos;
+
+            const resposta = {
+                rows: (temMais)? (todos.slice(0, limit)):todos,
+                limit: limit,
+                next: (temMais)? (offset+limit):null
+            }
+            
+            return res.status(200).json({resposta});
 
             // TodoModel.findAll(options: {...})
             // limit: int
@@ -70,10 +76,10 @@ export default (function () {
             const title = req.body.title;
             const is_checked = req.body.is_checked;
 
-        const todo = await TodoModel.create({ 
-            title: title,
-            is_checked: is_checked
-         });
+            const todo = await TodoModel.create({ 
+                title: title,
+                is_checked: is_checked
+            });
 
             return res.status(201).json(todo);
 
